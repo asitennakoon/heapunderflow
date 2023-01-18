@@ -1,17 +1,17 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Welcome extends CI_Controller
+class Home extends CI_Controller
 {
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model('User');
+		$this->load->model('UserModel');
 	}
 
 	public function index()
 	{
-		if ($this->User->is_logged_in()) {
+		if ($this->UserModel->is_logged_in()) {
 			$data = [];
 			$data['isLoggedIn'] = true;
 

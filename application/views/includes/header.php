@@ -47,8 +47,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <div class="col-md-4">
             </div>
             <div class="btn-toolbar">
-                <a href="<?= base_url() ?>index.php/QuestionController" class="btn btn-success btn-md"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a>
-                <a href="<?= base_url() ?>index.php/QuestionController/categories" class="btn btn-success btn-md"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Categories</a>
-                <a href="<?= base_url() ?>index.php/QuestionController/ask" class="btn btn-success btn-md" style="margin-left: 20%"><span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> Ask Question</a>
+                <a href="<?= base_url() ?>index.php/question" class="btn btn-success btn-md"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a>
+                <a href="<?= base_url() ?>index.php/question/categories" class="btn btn-success btn-md"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> Categories</a>
+                <a href="<?= base_url() ?>index.php/question/ask" class="btn btn-success btn-md" style="margin-left: 20%"><span class="glyphicon glyphicon-hand-up" aria-hidden="true"></span> Ask Question</a>
             </div>
         </div>

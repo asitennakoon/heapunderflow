@@ -75,7 +75,7 @@
         },
 
         // Defining the URL where the model should be sent
-        url: '<?= base_url() ?>index.php/QuestionController/question'
+        url: '<?= base_url() ?>index.php/question/question'
     });
 
     // Defining the QuestionForm View
@@ -97,7 +97,7 @@
 
             question.save({}, {
                 success: function(model, response) {
-                    window.location.href = '<?= base_url() ?>index.php/QuestionController/index/id/' + response.id;
+                    window.location.href = '<?= base_url() ?>index.php/question/index/id/' + response.id;
                 },
                 error: function(model, response) {
                     console.log(response.error);

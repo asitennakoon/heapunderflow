@@ -6,7 +6,7 @@ class Auth extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('User');
+        $this->load->model('UserModel');
     }
 
     public function confirmregister()
@@ -14,7 +14,7 @@ class Auth extends CI_Controller
         $fullName = $this->input->post('fullName');
         $username = $this->input->post('username');
         $password = $this->input->post('password');
-        if (!$this->User->create($fullName, $username, $password)) {
+        if (!$this->UserModel->create($fullName, $username, $password)) {
             //TODO: redirect to register again with an error message
         } else {
             $this->load->view('includes/header.php');
@@ -34,7 +34,7 @@ class Auth extends CI_Controller
                 array('login_error_msg' => "Username or Password is incorrect. Please try again.")
             );
             $this->load->view('includes/footer.php');
-        } elseif ($this->User->is_logged_in()) {
+        } elseif ($this->UserModel->is_logged_in()) {
             redirect('');
         } else {
             $this->load->view('includes/header.php');
@@ -47,7 +47,7 @@ class Auth extends CI_Controller
     {
         $username = $this->input->post('username');
         $password = $this->input->post('password');
-        if ($this->User->authenticate($username, $password)) {
+        if ($this->UserModel->authenticate($username, $password)) {
             log_message('debug', "Login Success. Username is $username");
             $this->session->is_logged_in = true;
             $this->session->username = $username;

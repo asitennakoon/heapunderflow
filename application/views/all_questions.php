@@ -20,12 +20,12 @@
                 </div>
 
                 <div class="col-md-10">
-                    <div class="row"><a href="<?= base_url() ?>index.php/QuestionController/index/id/<?= $question->id ?>"><strong><?= $question->title ?></strong></a></div>
+                    <div class="row"><a href="<?= base_url() ?>index.php/question/index/id/<?= $question->id ?>"><strong><?= $question->title ?></strong></a></div>
                     <div class="row"><?= $question->description ?></div>
                     <div class="row">
                         <div class="col-md-10">
                             <div class="row">
-                                <a href="<?= base_url() ?>index.php/QuestionController/index/category/<?= $question->category ?>">
+                                <a href="<?= base_url() ?>index.php/question/index/category/<?= $question->category ?>">
                                     <div class="label label-default tag-container"><?= $question->category ?></div>
                                 </a>
                             </div>

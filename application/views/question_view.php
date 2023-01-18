@@ -15,7 +15,7 @@
 
             <div class="col-md-11">
                 <h4><?= $question->description ?></h4>
-                <a href="<?= base_url() ?>index.php/QuestionController/index/category/<?= $question->category ?>">
+                <a href="<?= base_url() ?>index.php/question/index/category/<?= $question->category ?>">
                     <div class="label label-default tag-container">
                         <?= $question->category ?>
                     </div>
@@ -80,13 +80,13 @@
         },
 
         // Defining the URL where the model should be sent
-        url: '<?= base_url() ?>index.php/AnswerController/answer'
+        url: '<?= base_url() ?>index.php/answer/answer'
     });
 
     // Defining the Answer collection
     let Answers = Backbone.Collection.extend({
         model: Answer,
-        url: '<?= base_url() ?>index.php/AnswerController/answers/questionId/<?= $question->id ?>'
+        url: '<?= base_url() ?>index.php/answer/answers/questionId/<?= $question->id ?>'
     });
 
     let answers = new Answers();
@@ -128,7 +128,7 @@
 
         upvote: function(e) {
             $.ajax({
-                url: '<?= base_url() ?>index.php/AnswerController/upvote',
+                url: '<?= base_url() ?>index.php/answer/upvote',
                 method: 'POST',
                 data: {
                     answerId: $(e.currentTarget).data('answer-id')
@@ -144,7 +144,7 @@
 
         downvote: function(e) {
             $.ajax({
-                url: '<?= base_url() ?>index.php/AnswerController/downvote',
+                url: '<?= base_url() ?>index.php/answer/downvote',
                 method: 'POST',
                 data: {
                     answerId: $(e.currentTarget).data('answer-id')

@@ -6,19 +6,19 @@ use Restserver\Libraries\REST_Controller;
 
 require APPPATH . 'libraries/REST_Controller.php';
 
-class QuestionController extends REST_Controller
+class Question extends REST_Controller
 {
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('Question');
-        $this->load->model('Answer');
-        $this->load->model('User');
+        $this->load->model('QuestionModel');
+        $this->load->model('AnswerModel');
+        $this->load->model('UserModel');
     }
 
     public function question_post()
     {
-        if ($this->User->is_logged_in()) {
+        if ($this->UserModel->is_logged_in()) {
             $username = $this->session->username;
             $category = $this->post('category');
             $title = $this->post('title');
@@ -38,7 +38,7 @@ class QuestionController extends REST_Controller
 
             log_message('debug', "adding to username: $username");
 
-            $questionId = $this->Question->addQuestion($username, $category, $title, $description);
+            $questionId = $this->QuestionModel->addQuestion($username, $category, $title, $description);
 
             if ($questionId) {
                 $this->response(array('id' => $questionId), REST_Controller::HTTP_OK);
@@ -57,8 +57,8 @@ class QuestionController extends REST_Controller
         $questionId = $this->get('id');
         $category = $this->get('category');
         if ($questionId) {
-            $question = $this->Question->getQuestionsById($questionId);
-            // $answers = $this->Answer->getAnswers($questionId);
+            $question = $this->QuestionModel->getQuestionsById($questionId);
+            // $answers = $this->AnswerModel->getAnswers($questionId);
 
             if ($question) {
                 $this->load->view('includes/header.php');
@@ -70,13 +70,13 @@ class QuestionController extends REST_Controller
                 $this->load->view('includes/footer.php');
             }
         } elseif ($category) {
-            $questions = $this->Question->getQuestionsByCategory($category);
+            $questions = $this->QuestionModel->getQuestionsByCategory($category);
 
             $this->load->view('includes/header.php');
             $this->load->view('all_questions', array('questions' => $questions, 'header' => $category));
             $this->load->view('includes/footer.php');
         } else {
-            $questions = $this->Question->getQuestionsById(null);
+            $questions = $this->QuestionModel->getQuestionsById(null);
 
             $this->load->view('includes/header.php');
             $this->load->view('all_questions', array('questions' => $questions, 'header' => 'All'));
@@ -86,14 +86,14 @@ class QuestionController extends REST_Controller
 
     public function question_patch()
     {
-        if ($this->User->is_logged_in()) {
+        if ($this->UserModel->is_logged_in()) {
             $oldAction = $this->patch('oldAction');
             $newAction = $this->patch('newAction');
             $username = $this->session->username;
             log_message('debug', "patching to username: $username");
-            $this->Question->update($username, $oldAction, $newAction);
+            $this->QuestionModel->update($username, $oldAction, $newAction);
 
-            $actions = $this->Question->getlist($username);
+            $actions = $this->QuestionModel->getlist($username);
             $dto = array(
                 'result' => $actions
             );
@@ -109,7 +109,7 @@ class QuestionController extends REST_Controller
         $data = [];
         $data['isLoggedIn'] = true;
 
-        $categories = $this->Question->getCategories();
+        $categories = $this->QuestionModel->getCategories();
 
         $this->load->view('includes/header.php', $data);
         $this->load->view('new_question', array('categories' => $categories));
@@ -118,7 +118,7 @@ class QuestionController extends REST_Controller
 
     public function categories_get()
     {
-        $categories = $this->Question->getCategories();
+        $categories = $this->QuestionModel->getCategories();
 
         $this->load->view('includes/header.php');
         $this->load->view('categories', array('categories' => $categories));
@@ -127,13 +127,13 @@ class QuestionController extends REST_Controller
 
     public function question_delete()
     {
-        if ($this->User->is_logged_in()) {
+        if ($this->UserModel->is_logged_in()) {
             $deleteAction = $this->delete('deleteAction');
             $username = $this->session->username;
             log_message('debug', "deleting from username: $username");
-            $this->Question->remove($username, $deleteAction);
+            $this->QuestionModel->remove($username, $deleteAction);
 
-            $actions = $this->Question->getlist($username);
+            $actions = $this->QuestionModel->getlist($username);
             $dto = array(
                 'result' => $actions
             );

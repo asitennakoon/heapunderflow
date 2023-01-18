@@ -5,24 +5,24 @@ use Restserver\Libraries\REST_Controller;
 
 require APPPATH . 'libraries/REST_Controller.php';
 
-class AnswerController extends REST_Controller
+class Answer extends REST_Controller
 {
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('Answer');
-        $this->load->model('User');
+        $this->load->model('AnswerModel');
+        $this->load->model('UserModel');
     }
 
     public function answer_post()
     {
-        if ($this->User->is_logged_in()) {
+        if ($this->UserModel->is_logged_in()) {
             $questionId = $this->post('questionId');
             $username = $this->session->username;
             $description = $this->post('description');
-            $answerId = $this->Answer->addAnswer($questionId, $username, $description);
+            $answerId = $this->AnswerModel->addAnswer($questionId, $username, $description);
 
-            $answer = $this->Answer->getAnswerById($answerId);
+            $answer = $this->AnswerModel->getAnswerById($answerId);
 
             if ($answer) {
                 $this->response($answer, REST_Controller::HTTP_OK);
@@ -39,7 +39,7 @@ class AnswerController extends REST_Controller
     public function answers_get()
     {
         $questionId = $this->get('questionId');
-        $answers = $this->Answer->getAnswers($questionId);
+        $answers = $this->AnswerModel->getAnswers($questionId);
 
         if ($answers) {
             $this->response($answers, REST_Controller::HTTP_OK);
@@ -51,18 +51,18 @@ class AnswerController extends REST_Controller
     public function upvote_post()
     {
         $answerId = $this->post('answerId');
-        $this->Answer->upvote($answerId);
+        $this->AnswerModel->upvote($answerId);
 
-        $answer = $this->Answer->getAnswerById($answerId);
+        $answer = $this->AnswerModel->getAnswerById($answerId);
         $this->response($answer, REST_Controller::HTTP_OK);
     }
 
     public function downvote_post()
     {
         $answerId = $this->post('answerId');
-        $this->Answer->downvote($answerId);
+        $this->AnswerModel->downvote($answerId);
 
-        $answer = $this->Answer->getAnswerById($answerId);
+        $answer = $this->AnswerModel->getAnswerById($answerId);
         $this->response($answer, REST_Controller::HTTP_OK);
     }
 
@@ -70,12 +70,12 @@ class AnswerController extends REST_Controller
     {
         $questionId = $this->get('id');
         if ($questionId) {
-            $question = $this->Question->getQuestionsById($questionId);
+            $question = $this->QuestionModel->getQuestionsById($questionId);
             $this->load->view('includes/header.php');
             $this->load->view('question_view', array('question' => $question));
             $this->load->view('includes/footer.php');
         } else {
-            $questions = $this->Question->getQuestionsById(null);
+            $questions = $this->QuestionModel->getQuestionsById(null);
             $this->load->view('includes/header.php');
             $this->load->view('all_questions', array('questions' => $questions, 'header' => 'All'));
             $this->load->view('includes/footer.php');
@@ -84,14 +84,14 @@ class AnswerController extends REST_Controller
 
     public function answer_patch()
     {
-        if ($this->User->is_logged_in()) {
+        if ($this->UserModel->is_logged_in()) {
             $oldAction = $this->patch('oldAction');
             $newAction = $this->patch('newAction');
             $username = $this->session->username;
             log_message('debug', "patching to username: $username");
-            $this->Question->update($username, $oldAction, $newAction);
+            $this->QuestionModel->update($username, $oldAction, $newAction);
 
-            $actions = $this->Question->getlist($username);
+            $actions = $this->QuestionModel->getlist($username);
             $dto = array(
                 'result' => $actions
             );
@@ -104,13 +104,13 @@ class AnswerController extends REST_Controller
 
     public function answer_delete()
     {
-        if ($this->User->is_logged_in()) {
+        if ($this->UserModel->is_logged_in()) {
             $deleteAction = $this->delete('deleteAction');
             $username = $this->session->username;
             log_message('debug', "deleting from username: $username");
-            $this->Question->remove($username, $deleteAction);
+            $this->QuestionModel->remove($username, $deleteAction);
 
-            $actions = $this->Question->getlist($username);
+            $actions = $this->QuestionModel->getlist($username);
             $dto = array(
                 'result' => $actions
             );
