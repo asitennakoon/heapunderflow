@@ -41,7 +41,7 @@
 
                 <div class="col-md-4">
                     <div class="card" style="border-color: <?= $randomColor ?>">
-                        <a href="<?= base_url() ?>index.php/question/index/category/<?= $category->name ?>">
+                        <a href="<?= base_url() ?>index.php/question/question/category/<?= $category->name ?>">
                             <div class="card-header">
                                 <span class="label label-primary label-hover">
                                     <?= $category->name ?>

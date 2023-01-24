@@ -1,7 +1,7 @@
 <div class="container">
     <?php
+    echo '<h2>' . $header . '</h2>';
     if ($questions) {
-        echo '<h2>' . $header . ' Questions (' . count($questions) . ')</h2>';
         foreach ($questions as $question) {
     ?>
             <div class="row question-container">
@@ -20,12 +20,12 @@
                 </div>
 
                 <div class="col-md-10">
-                    <div class="row"><a href="<?= base_url() ?>index.php/question/index/id/<?= $question->id ?>"><strong><?= $question->title ?></strong></a></div>
+                    <div class="row"><a href="<?= base_url() ?>index.php/question/question/id/<?= $question->id ?>"><strong><?= $question->title ?></strong></a></div>
                     <div class="row"><?= $question->description ?></div>
                     <div class="row">
                         <div class="col-md-10">
                             <div class="row">
-                                <a href="<?= base_url() ?>index.php/question/index/category/<?= $question->category ?>">
+                                <a href="<?= base_url() ?>index.php/question/question/category/<?= $question->category ?>">
                                     <div class="label label-default tag-container"><?= $question->category ?></div>
                                 </a>
                             </div>

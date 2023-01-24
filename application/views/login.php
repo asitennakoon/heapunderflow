@@ -24,12 +24,12 @@
                         <input type="password" class="form-control" id="password" name="password" placeholder="Password">
                     </div>
                 </div>
-                <a href="">Forgot password</a>
-                <div class="form-group">
-                    <div class="col-sm-6">
+                <!-- <a href="">Forgot password</a> -->
+                <div class="form-group" style="display: flex; justify-content: center">
+                    <div>
                         <button type="submit" class="btn btn-success">Login</button>
                     </div>
-                    <div class="col-sm-6">
+                    <div style="margin-left: 25px">
                         <a href="<?= base_url() ?>index.php" class="btn btn-success">Create Account</a>
                     </div>
                 </div>

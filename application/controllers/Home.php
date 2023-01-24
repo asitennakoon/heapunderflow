@@ -7,16 +7,17 @@ class Home extends CI_Controller
 	{
 		parent::__construct();
 		$this->load->model('UserModel');
+		$this->load->model('QuestionModel');
 	}
 
 	public function index()
 	{
 		if ($this->UserModel->is_logged_in()) {
-			$data = [];
-			$data['isLoggedIn'] = true;
+			$questions = $this->QuestionModel->getTrendingQuestions();
+			$header = ($questions == false) ? 'Trending questions from this week would be displayed here' : 'This Week\'s Trending';
 
-			$this->load->view('includes/header.php', $data);
-			$this->load->view('dashboard');
+			$this->load->view('includes/header.php', array('isLoggedIn' => true));
+			$this->load->view('all_questions', array('questions' => $questions, 'header' => $header));
 			$this->load->view('includes/footer.php');
 		} else {
 			$this->load->view('includes/header.php');

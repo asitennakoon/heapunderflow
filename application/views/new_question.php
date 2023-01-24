@@ -42,12 +42,12 @@
             </div>
         </div>
 
-        <div class="form-group">
+        <!-- <div class="form-group">
             <label for="tags" class="col-sm-1 control-label">Tags</label>
             <div class="col-sm-10">
                 <input type="text" class="form-control" id="tags" placeholder="Tags">
             </div>
-        </div>
+        </div> -->
 
         <div class="form-group">
             <div class="col-sm-offset-1 col-sm-10">
@@ -97,7 +97,7 @@
 
             question.save({}, {
                 success: function(model, response) {
-                    window.location.href = '<?= base_url() ?>index.php/question/index/id/' + response.id;
+                    window.location.href = '<?= base_url() ?>index.php/question/question/id/' + response.id;
                 },
                 error: function(model, response) {
                     console.log(response.error);

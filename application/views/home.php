@@ -27,11 +27,11 @@
                         <input type="password" class="form-control" id="confirmPassword" placeholder="Password">
                     </div>
                 </div>
-                <div class="form-group">
-                    <div class="col-sm-6">
+                <div class="form-group" style="justify-content: center; display: flex">
+                    <div class="col-sm-3">
                         <button type="submit" class="btn btn-success">Sign up</button>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-3">
                         <a href="<?= base_url() ?>index.php/auth/login" class="btn btn-success">Already a User?</a>
                     </div>
                 </div>

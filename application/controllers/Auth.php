@@ -48,20 +48,54 @@ class Auth extends CI_Controller
         $username = $this->input->post('username');
         $password = $this->input->post('password');
         if ($this->UserModel->authenticate($username, $password)) {
-            log_message('debug', "Login Success. Username is $username");
             $this->session->is_logged_in = true;
             $this->session->username = $username;
             redirect('');
         } else {
-            log_message('debug', "Login failed for $username");
             $this->session->login_error = true;
             redirect('/auth/login');
         }
     }
 
+    public function account()
+    {
+        $username = $this->session->username;
+        $fullName = $this->UserModel->getAccountName($username);
+
+        $this->load->view('includes/header.php', array('isLoggedIn' => $this->UserModel->is_logged_in()));
+        $this->load->view('account', array('fullName' => $fullName));
+        $this->load->view('includes/footer.php');
+    }
+
+    public function changename()
+    {
+        $username = $this->session->username;
+        $newFullName = $this->input->post('fullName');
+        $this->UserModel->changeFulLName($username, $newFullName);
+
+        header('Content-Type: application/json');
+        echo json_encode($this->UserModel->getAccountName($username));
+    }
+
+    public function changepassword()
+    {
+        $username = $this->session->username;
+        $oldPassword = $this->input->post('oldPassword');
+        $newPassword = $this->input->post('newPassword');
+        $success = $this->UserModel->changePassword($username, $oldPassword, $newPassword);
+
+        if ($success) {
+            $this->session->is_logged_in = false;
+            header('Content-Type: application/json');
+            echo json_encode("Password Changed Successfully");
+        } else {
+            // Display error msg
+        }
+    }
+
     public function logout()
     {
-        $this->session->is_logged_in = false; //or session destroy
+        $this->session->is_logged_in = false;
         redirect('');
     }
 }

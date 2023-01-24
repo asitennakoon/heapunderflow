@@ -22,6 +22,7 @@ class UserModel extends CI_Model
     function authenticate($username, $password)
     {
         $query = $this->db->get_where('user', array('username' => $username));
+
         if ($query->num_rows() != 1) {
             return false;
         } else {
@@ -40,6 +41,44 @@ class UserModel extends CI_Model
             return true;
         } else {
             return false;
+        }
+    }
+
+    function getAccountName($username)
+    {
+        $this->db->where('username', $username);
+        $query = $this->db->get('user');
+
+        if ($query->num_rows() != 1) {
+            return false;
+        } else {
+            return $query->row()->fullName;
+        }
+    }
+
+    function changeFullName($username, $fullName)
+    {
+        $this->db->where(array('username' => $username));
+        $this->db->update('user', array('fullName' => $fullName));
+    }
+
+    function changePassword($username, $oldPassword, $newPassword)
+    {
+        $query = $this->db->get_where('user', array('username' => $username));
+
+        if ($query->num_rows() != 1) {
+            return false;
+        } else {
+            $row = $query->row();
+
+            if (password_verify($oldPassword, $row->password)) {
+
+                $hashed_password = password_hash($newPassword, PASSWORD_DEFAULT);
+                $this->db->update('user', array('password' => $hashed_password));
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 }

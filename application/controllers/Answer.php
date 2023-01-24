@@ -16,23 +16,17 @@ class Answer extends REST_Controller
 
     public function answer_post()
     {
-        if ($this->UserModel->is_logged_in()) {
-            $questionId = $this->post('questionId');
-            $username = $this->session->username;
-            $description = $this->post('description');
-            $answerId = $this->AnswerModel->addAnswer($questionId, $username, $description);
+        $questionId = $this->post('questionId');
+        $username = $this->session->username;
+        $description = $this->post('description');
+        $answerId = $this->AnswerModel->addAnswer($questionId, $username, $description);
 
-            $answer = $this->AnswerModel->getAnswerById($answerId);
+        $answer = $this->AnswerModel->getAnswerById($answerId);
 
-            if ($answer) {
-                $this->response($answer, REST_Controller::HTTP_OK);
-            } else {
-                $this->response('Error: Failed to insert question', REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-            }
+        if ($answer) {
+            $this->response($answer, REST_Controller::HTTP_OK);
         } else {
-            $this->load->view('includes/header.php');
-            $this->load->view('login');
-            $this->load->view('includes/footer.php');
+            $this->response('Error: Failed to insert question', REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -46,6 +40,30 @@ class Answer extends REST_Controller
         } else {
             $this->response('Error: Failed to get answers', REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function answer_patch()
+    {
+        $answerId = $this->patch('id');
+        $username = $this->session->username;
+        $description = $this->patch('description');
+        $this->AnswerModel->update($answerId, $username, $description);
+
+        $answer = $this->AnswerModel->getAnswerById($answerId);
+
+        if ($answer) {
+            $this->response($answer, REST_Controller::HTTP_OK);
+        } else {
+            $this->response('Error: Failed to update answer', REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function answer_delete($id)
+    {
+        $username = $this->session->username;
+        $this->AnswerModel->remove($username, $id);
+
+        $this->set_response(null, REST_Controller::HTTP_NO_CONTENT);
     }
 
     public function upvote_post()
@@ -64,60 +82,5 @@ class Answer extends REST_Controller
 
         $answer = $this->AnswerModel->getAnswerById($answerId);
         $this->response($answer, REST_Controller::HTTP_OK);
-    }
-
-    public function answer_get()
-    {
-        $questionId = $this->get('id');
-        if ($questionId) {
-            $question = $this->QuestionModel->getQuestionsById($questionId);
-            $this->load->view('includes/header.php');
-            $this->load->view('question_view', array('question' => $question));
-            $this->load->view('includes/footer.php');
-        } else {
-            $questions = $this->QuestionModel->getQuestionsById(null);
-            $this->load->view('includes/header.php');
-            $this->load->view('all_questions', array('questions' => $questions, 'header' => 'All'));
-            $this->load->view('includes/footer.php');
-        }
-    }
-
-    public function answer_patch()
-    {
-        if ($this->UserModel->is_logged_in()) {
-            $oldAction = $this->patch('oldAction');
-            $newAction = $this->patch('newAction');
-            $username = $this->session->username;
-            log_message('debug', "patching to username: $username");
-            $this->QuestionModel->update($username, $oldAction, $newAction);
-
-            $actions = $this->QuestionModel->getlist($username);
-            $dto = array(
-                'result' => $actions
-            );
-
-            $this->set_response($dto, REST_Controller::HTTP_OK);
-        } else {
-            $this->load->view('login');
-        }
-    }
-
-    public function answer_delete()
-    {
-        if ($this->UserModel->is_logged_in()) {
-            $deleteAction = $this->delete('deleteAction');
-            $username = $this->session->username;
-            log_message('debug', "deleting from username: $username");
-            $this->QuestionModel->remove($username, $deleteAction);
-
-            $actions = $this->QuestionModel->getlist($username);
-            $dto = array(
-                'result' => $actions
-            );
-
-            $this->set_response($dto, REST_Controller::HTTP_OK);
-        } else {
-            $this->load->view('login');
-        }
     }
 }

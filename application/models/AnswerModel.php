@@ -31,6 +31,7 @@ class AnswerModel extends CI_Model
     {
         $this->db->where('id', $answerId);
         $query = $this->db->get('answer');
+
         if ($query->num_rows() != 1) {
             return false;
         } else {
@@ -43,6 +44,7 @@ class AnswerModel extends CI_Model
         $this->db->order_by('upvoteCount', 'DESC');
         $this->db->where('questionId', $questionId);
         $query = $this->db->get('answer');
+
         if ($query->num_rows() == 0) {
             return false;
         }
@@ -51,6 +53,28 @@ class AnswerModel extends CI_Model
             $answers[] = $row;
         }
         return $answers;
+    }
+
+    function update($answerId, $username, $description)
+    {
+        $this->db->where(array('id' => $answerId, 'username' => $username));
+        $this->db->update('answer', array('description' => $description));
+    }
+
+    function remove($username, $id)
+    {
+        //Retrieve the questionId from the answer table
+        $this->db->where('id', $id);
+        $query = $this->db->get('answer');
+        $questionId = $query->row()->questionId;
+
+        //Decrement the answerCount column in the question table
+        $this->db->set('answerCount', 'answerCount - 1', FALSE);
+        $this->db->where('id', $questionId);
+        $this->db->update('question');
+
+        //Delete answer entry
+        $this->db->delete('answer', array('username' => $username, 'id' => $id));
     }
 
     function upvote($answerId)
@@ -65,16 +89,5 @@ class AnswerModel extends CI_Model
         $this->db->set('upvoteCount', 'upvoteCount-1', FALSE);
         $this->db->where('id', $answerId);
         $this->db->update('answer');
-    }
-
-    function update($username, $oldAction, $newAction)
-    {
-        $this->db->where(array('username' => $username, 'id' => $oldAction));
-        $this->db->update('todo', array('action' => $newAction));
-    }
-
-    function remove($username, $deleteAction)
-    {
-        $this->db->delete('todo', array('username' => $username, 'id' => $deleteAction));
     }
 }

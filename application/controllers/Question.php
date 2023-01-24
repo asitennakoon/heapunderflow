@@ -1,5 +1,4 @@
 <?php
-
 defined('BASEPATH') or exit('No direct script access allowed');
 
 use Restserver\Libraries\REST_Controller;
@@ -18,100 +17,115 @@ class Question extends REST_Controller
 
     public function question_post()
     {
-        if ($this->UserModel->is_logged_in()) {
-            $username = $this->session->username;
-            $category = $this->post('category');
-            $title = $this->post('title');
-            $description = $this->post('description');
+        $username = $this->session->username;
+        $category = $this->post('category');
+        $title = $this->post('title');
+        $description = $this->post('description');
 
-            // if (empty($title)) {
-            //     $this->response(array('error' => 'Title is required'), 400);
-            //     return;
-            // }
+        // if (empty($title)) {
+        //     $this->response(array('error' => 'Title is required'), 400);
+        //     return;
+        // }
 
-            // $data = array(
-            //     'username' => $username,
-            //     'title' => $title,
-            //     'category' => $category,
-            //     'description' => $description
-            // );
+        // $data = array(
+        //     'username' => $username,
+        //     'title' => $title,
+        //     'category' => $category,
+        //     'description' => $description
+        // );
 
-            log_message('debug', "adding to username: $username");
+        $questionId = $this->QuestionModel->addQuestion($username, $category, $title, $description);
 
-            $questionId = $this->QuestionModel->addQuestion($username, $category, $title, $description);
-
-            if ($questionId) {
-                $this->response(array('id' => $questionId), REST_Controller::HTTP_OK);
-            } else {
-                $this->response(array('error' => 'Failed to insert question'), REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
-            }
+        if ($questionId) {
+            $this->response(array('id' => $questionId), REST_Controller::HTTP_OK);
         } else {
-            $this->load->view('includes/header.php');
-            $this->load->view('login');
-            $this->load->view('includes/footer.php');
+            $this->response(array('error' => 'Failed to insert question'), REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function index_get()
+    public function question_get()
     {
         $questionId = $this->get('id');
         $category = $this->get('category');
         if ($questionId) {
             $question = $this->QuestionModel->getQuestionsById($questionId);
-            // $answers = $this->AnswerModel->getAnswers($questionId);
+            $categories = $this->QuestionModel->getCategories();
 
             if ($question) {
-                $this->load->view('includes/header.php');
-                $this->load->view('question_view', array('question' => $question));
+                $this->load->view('includes/header.php', array('isLoggedIn' => $this->UserModel->is_logged_in()));
+                $this->load->view('question_view', array('question' => $question, 'categories' => $categories));
                 $this->load->view('includes/footer.php');
             } else {
-                $this->load->view('includes/header.php');
+                $this->load->view('includes/header.php', array('isLoggedIn' => $this->UserModel->is_logged_in()));
                 $this->load->view('errors/html/error_404.php', array('heading' => 'Error', 'message' => 'Ooops! Page Not Found'));
                 $this->load->view('includes/footer.php');
             }
         } elseif ($category) {
             $questions = $this->QuestionModel->getQuestionsByCategory($category);
+            $header = ($questions == false) ? "No $category questions found" : "$category questions (" . count($questions) . ")";
 
-            $this->load->view('includes/header.php');
-            $this->load->view('all_questions', array('questions' => $questions, 'header' => $category));
+            $this->load->view('includes/header.php', array('isLoggedIn' => $this->UserModel->is_logged_in()));
+            $this->load->view('all_questions', array('questions' => $questions, 'header' => $header));
             $this->load->view('includes/footer.php');
         } else {
             $questions = $this->QuestionModel->getQuestionsById(null);
+            $header = ($questions == false) ? "No questions added" : "All Questions (" . count($questions) . ")";
 
-            $this->load->view('includes/header.php');
-            $this->load->view('all_questions', array('questions' => $questions, 'header' => 'All'));
+            $this->load->view('includes/header.php', array('isLoggedIn' => $this->UserModel->is_logged_in()));
+            $this->load->view('all_questions', array('questions' => $questions, 'header' => $header));
             $this->load->view('includes/footer.php');
         }
     }
 
     public function question_patch()
     {
-        if ($this->UserModel->is_logged_in()) {
-            $oldAction = $this->patch('oldAction');
-            $newAction = $this->patch('newAction');
-            $username = $this->session->username;
-            log_message('debug', "patching to username: $username");
-            $this->QuestionModel->update($username, $oldAction, $newAction);
+        $id = $this->patch('id');
+        $username = $this->session->username;
+        $category = $this->patch('category');
+        $title = $this->patch('title');
+        $description = $this->patch('description');
+        $this->QuestionModel->update($id, $username, $category, $title, $description);
 
-            $actions = $this->QuestionModel->getlist($username);
-            $dto = array(
-                'result' => $actions
-            );
+        $question = $this->QuestionModel->getQuestionsById($id);
 
-            $this->set_response($dto, REST_Controller::HTTP_OK);
+        if ($question) {
+            $this->response($question, REST_Controller::HTTP_OK);
         } else {
-            $this->load->view('login');
+            $this->response('Error: Failed to update question', REST_Controller::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function question_delete($id)
+    {
+        $username = $this->session->username;
+        $this->QuestionModel->remove($username, $id);
+
+        $this->set_response(null, REST_Controller::HTTP_NO_CONTENT);
+    }
+
+    public function upvote_post()
+    {
+        $id = $this->post('id');
+        $this->QuestionModel->upvote($id);
+
+        $question = $this->QuestionModel->getQuestionsById($id);
+        $this->response($question, REST_Controller::HTTP_OK);
+    }
+
+    public function downvote_post()
+    {
+        $id = $this->post('id');
+        $this->QuestionModel->downvote($id);
+
+        $question = $this->QuestionModel->getQuestionsById($id);
+        $this->response($question, REST_Controller::HTTP_OK);
     }
 
     public function ask_get()
     {
-        $data = [];
-        $data['isLoggedIn'] = true;
-
         $categories = $this->QuestionModel->getCategories();
 
-        $this->load->view('includes/header.php', $data);
+        $this->load->view('includes/header.php', array('isLoggedIn' => $this->UserModel->is_logged_in()));
         $this->load->view('new_question', array('categories' => $categories));
         $this->load->view('includes/footer.php');
     }
@@ -120,27 +134,19 @@ class Question extends REST_Controller
     {
         $categories = $this->QuestionModel->getCategories();
 
-        $this->load->view('includes/header.php');
+        $this->load->view('includes/header.php', array('isLoggedIn' => $this->UserModel->is_logged_in()));
         $this->load->view('categories', array('categories' => $categories));
         $this->load->view('includes/footer.php');
     }
 
-    public function question_delete()
+    public function search_get()
     {
-        if ($this->UserModel->is_logged_in()) {
-            $deleteAction = $this->delete('deleteAction');
-            $username = $this->session->username;
-            log_message('debug', "deleting from username: $username");
-            $this->QuestionModel->remove($username, $deleteAction);
+        $keyword = $this->get('keyword');
+        $questions = $this->QuestionModel->find($keyword);
+        $header = ($questions == false) ? "No questions containing \"$keyword\" found" : "Questions containing \"$keyword\" (" . count($questions) . ")";
 
-            $actions = $this->QuestionModel->getlist($username);
-            $dto = array(
-                'result' => $actions
-            );
-
-            $this->set_response($dto, REST_Controller::HTTP_OK);
-        } else {
-            $this->load->view('login');
-        }
+        $this->load->view('includes/header.php', array('isLoggedIn' => $this->UserModel->is_logged_in()));
+        $this->load->view('all_questions', array('questions' => $questions, 'header' => $header));
+        $this->load->view('includes/footer.php');
     }
 }
