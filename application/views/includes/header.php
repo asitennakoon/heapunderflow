@@ -22,9 +22,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <a class="navbar-brand" href="<?= base_url() ?>index.php">heap<b>underflow</b></a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
-                <form class="navbar-form navbar-left" action="<?= base_url() ?>index.php/question/search">
-                    <input type="text" class="form-control" name="keyword" id="keyword" placeholder="Search">
-                </form>
+                <?php if (isset($isLoggedIn) && $isLoggedIn) { ?>
+                    <form class="navbar-form navbar-left" action="<?= base_url() ?>index.php/question/search">
+                        <input type="text" class="form-control" name="keyword" id="keyword" placeholder="Search">
+                    </form>
+                <?php } ?>
                 <ul class="nav navbar-nav navbar-right">
                     <?php if (isset($isLoggedIn) && $isLoggedIn) { ?>
                         <li>
